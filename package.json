@@ -1,0 +1,29 @@
+{
+  "name": "A6_RedisWithNode",
+  "version": "1.0.0",
+  "description": "In this assignment you will be using Node to interact with an in-memory Redis Database. For this we will be building on the Mongo Database you used for Assignment 5.",
+  "main": "eslintrc.js",
+  "scripts": {
+    "start": "node redisDB.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ely-lam/A6_RedisWithNode.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ely-lam/A6_RedisWithNode/issues"
+  },
+  "homepage": "https://github.com/ely-lam/A6_RedisWithNode#readme",
+  "dependencies": {
+    "redis": "^4.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.3.0",
+    "eslint-config-prettier": "^8.3.0",
+    "prettier": "^2.5.0"
+  }
+}
