@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/ely-lam/A6_RedisWithNode#readme",
   "dependencies": {
+    "mongodb": "^4.2.1",
     "redis": "^4.0.0"
   },
   "devDependencies": {

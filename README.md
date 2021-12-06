@@ -1,5 +1,6 @@
 # Assignment 6: Use Redis With Node
- In this assignment you will be using Node to interact with an in-memory Redis Database. For this we will be building on the Mongo Database you used for Assignment 5.
+
+In this assignment you will be using Node to interact with an in-memory Redis Database. For this we will be building on the Mongo Database you used for Assignment 5.
 
 ## Overview:
 
@@ -24,7 +25,8 @@ To run all queries at once:
 To run queries 1-4 individually:
 
 1. `npm install`
-2. `node ./query1`
-3. `node ./query2`
-4. `node ./query3`
-5. `node ./query4`
+2. `node queries/query1`
+3. `node queries/query2`
+4. `node queries/query3`
+5. `node queries/query4`
+6. `node queries/query5`
