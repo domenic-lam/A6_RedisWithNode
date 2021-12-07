@@ -6,7 +6,7 @@ of favorites on each tweet (INCRBY), and then get the value (GET) and print it o
 const { MongoClient } = require("mongodb");
 const { createClient } = require("redis");
 
-let countTweets = async function () {
+let countFavorites = async function () {
   let db, mongoClient, redisClient;
 
   try {
@@ -25,16 +25,27 @@ let countTweets = async function () {
     await redisClient.connect();
     // console.log("connected");
 
-    await redisClient.set("tweetCount", "0");
-    let tweetCount = await redisClient.get("tweetCount");
+    await redisClient.set("favoritesSum", "0");
+    await tweet
+      .aggregate([
+        {
+          $group: {
+            _id: "$id",
+            favorite_count: {
+              $first: "$favorite_count",
+            },
+          },
+        },
+      ])
+      .forEach(async function (doc) {
+        // console.log(`favorite_count: ${doc.favorite_count}`);
+        await redisClient.INCRBY("favoritesSum", parseInt(doc.favorite_count));
+        // console.log(`favoritesSum iter: ${favoritesSum}`);
+      });
 
-    await tweet.find({}).forEach(function () {
-      redisClient.incr("tweetCount");
-      tweetCount++;
-    });
+    let favoritesSum = parseInt(await redisClient.get("favoritesSum"));
 
-    console.log(`There were ${tweetCount} tweets`);
-    return 0;
+    console.log(`Query 2: favoritesSum = ${favoritesSum}`);
   } catch (err) {
     console.log(err);
   } finally {
@@ -43,4 +54,4 @@ let countTweets = async function () {
   }
 };
 
-module.exports = countTweets();
+module.exports = countFavorites();

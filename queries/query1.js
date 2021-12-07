@@ -28,15 +28,13 @@ let countTweets = async function () {
     // console.log("connected");
 
     await redisClient.set("tweetCount", "0");
-    let tweetCount = await redisClient.get("tweetCount");
 
-    await tweet.find({}).forEach(function () {
-      redisClient.incr("tweetCount");
-      tweetCount++;
+    await tweet.find({}).forEach(async function () {
+      await redisClient.incr("tweetCount");
     });
 
-    console.log(`There were ${tweetCount} tweets`);
-    return 0;
+    let tweetCount = await redisClient.get("tweetCount");
+    console.log(`Query 1: There were ${tweetCount} tweets`);
   } catch (err) {
     console.log(err);
   } finally {
