@@ -14,47 +14,24 @@ let countDistinctUsers = async function () {
     mongoClient = new MongoClient(uri);
     await mongoClient.connect();
 
-    db = mongoClient.db("ieeevisTweets");
     // Mongo GET tweets
+    db = mongoClient.db("ieeevisTweets");
     const tweet = db.collection("tweet");
 
     // Redis setup
     redisClient = createClient();
-    redisClient.on("error", err => console.log("Redis Client Error", err));
     await redisClient.connect();
-    // console.log("connected");
 
-    await redisClient.SET("numUsers", "0");
     // In case screen_names set has already been created, remove set
-    await redisClient.DEL("screen_names");
+    await redisClient.del("screen_names");
 
-    await tweet
-      .aggregate([
-        {
-          $group: {
-            _id: "$user.id",
-            userInfo: {
-              $first: "$user",
-            },
-          },
-        },
-        {
-          $replaceRoot: {
-            newRoot: "$userInfo",
-          },
-        },
-      ])
-      .forEach(async function (doc) {
-        /* Note: I did not use a promise to SADD to the set because when I did, as 
-        it caused the adding to the set and incrementing numUsers to be out of order,\
-        and thus would give different wrong answers sometimes.*/
-        let res = redisClient.SADD("screen_names", doc.screen_name);
-        if (res != "0") {
-          await redisClient.INCR("numUsers");
-        }
-      });
+    // use a set by the screen_name, e.g. screen_names
+    await tweet.find().forEach(async function (doc) {
+      await redisClient.sAdd("screen_names", doc.user.screen_name);
+    });
 
-    let numUsers = await redisClient.get("numUsers");
+    // Compute how many distinct users are there in the dataset
+    let numUsers = await redisClient.sCard("screen_names");
     console.log(`Query 3: Number of distinct users = ${numUsers}`);
   } catch (err) {
     console.log(err);

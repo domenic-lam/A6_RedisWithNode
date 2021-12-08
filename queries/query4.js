@@ -14,8 +14,8 @@ let createLeaderboard = async function () {
     mongoClient = new MongoClient(uri);
     await mongoClient.connect();
 
-    db = mongoClient.db("ieeevisTweets");
     // Mongo GET tweets
+    db = mongoClient.db("ieeevisTweets");
     const tweet = db.collection("tweet");
 
     // Redis setup
@@ -24,32 +24,28 @@ let createLeaderboard = async function () {
     await redisClient.connect();
     // console.log("connected");
 
-    let numUsers = 0;
     // In case leaderboard sorted set has already been created, remove set
-    await redisClient.DEL("leaderboard");
-    // console.log(`deleted screen_name: ${deletion}`);
+    await redisClient.del("leaderboard");
 
-    await tweet
-      .aggregate([
-        {
-          $group: {
-            _id: "$user.screen_name",
-            numTweets: { $sum: 1 },
-          },
-        },
-        { $sort: { numTweets: -1 } },
-      ])
-      .forEach(async function (doc) {
-        // console.log(`screen_name: ${doc.screen_name}`);
-        let res = await redisClient.ZADD("screen_names", doc.screen_name);
-        if (res == 0) {
-          console.log(`screen_names unsuccessful: ${doc.screen_name}`);
-        } else {
-          numUsers++;
-        }
-      });
+    // Create a leaderboard with the top 10 users with more tweets
+    await tweet.find().forEach(async function (doc) {
+      await redisClient.zAdd("leaderboard", [
+        { score: "1", value: doc.screen_name },
+        { CX: 1 },
+      ]);
+    });
 
-    console.log(`Number of distinct users: ${numUsers}`);
+    await redisClient.zRange("test", "+inf", "-inf", {
+      BY: "SCORE",
+      REV: true,
+    });
+    const leaderboard = await redisClient.zRangeWithScores(
+      "leaderboard",
+      0,
+      -1
+    );
+
+    console.log(`Leaderboard: ${leaderboard}`);
   } catch (err) {
     console.log(err);
   } finally {

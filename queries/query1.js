@@ -17,22 +17,23 @@ let countTweets = async function () {
     mongoClient = new MongoClient(uri);
     await mongoClient.connect();
 
-    db = mongoClient.db("ieeevisTweets");
     // Mongo GET tweets
+    db = mongoClient.db("ieeevisTweets");
     const tweet = db.collection("tweet");
 
     // Redis setup
     redisClient = createClient();
-    redisClient.on("error", err => console.log("Redis Client Error", err));
     await redisClient.connect();
-    // console.log("connected");
 
+    //initialize tweetCount in 0 (SET)
     await redisClient.set("tweetCount", "0");
 
-    await tweet.find({}).forEach(async function () {
+    // query the tweets collection in Mongo and increase (INCR) tweetCount
+    await tweet.find().forEach(async function () {
       await redisClient.incr("tweetCount");
     });
 
+    // get the last value of tweetCount (GET) and print it in the console
     let tweetCount = await redisClient.get("tweetCount");
     console.log(`Query 1: There were ${tweetCount} tweets`);
   } catch (err) {

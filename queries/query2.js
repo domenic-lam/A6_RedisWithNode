@@ -15,36 +15,24 @@ let countFavorites = async function () {
     mongoClient = new MongoClient(uri);
     await mongoClient.connect();
 
-    db = mongoClient.db("ieeevisTweets");
     // Mongo GET tweets
+    db = mongoClient.db("ieeevisTweets");
     const tweet = db.collection("tweet");
 
     // Redis setup
     redisClient = createClient();
-    redisClient.on("error", err => console.log("Redis Client Error", err));
     await redisClient.connect();
-    // console.log("connected");
 
+    // start a favoritesSum key (SET)
     await redisClient.set("favoritesSum", "0");
-    await tweet
-      .aggregate([
-        {
-          $group: {
-            _id: "$id",
-            favorite_count: {
-              $first: "$favorite_count",
-            },
-          },
-        },
-      ])
-      .forEach(async function (doc) {
-        // console.log(`favorite_count: ${doc.favorite_count}`);
-        await redisClient.INCRBY("favoritesSum", parseInt(doc.favorite_count));
-        // console.log(`favoritesSum iter: ${favoritesSum}`);
-      });
 
+    // increment it by the number of favorites on each tweet (INCRBY)
+    await tweet.find().forEach(async function (doc) {
+      await redisClient.incrBy("favoritesSum", parseInt(doc.favorite_count));
+    });
+
+    // get the value (GET) and print it on the screen
     let favoritesSum = parseInt(await redisClient.get("favoritesSum"));
-
     console.log(`Query 2: favoritesSum = ${favoritesSum}`);
   } catch (err) {
     console.log(err);
