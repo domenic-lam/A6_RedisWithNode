@@ -44,21 +44,12 @@ let getUserTweets = async function () {
         screen_name: doc.user.screen_name,
         text: doc.text,
         created_at: doc.created_at,
-        id: doc.id,
         is_quote_status: doc.is_quote_status,
         source: doc.source,
         retweet_count: doc.retweet_count,
         favorite_count: doc.favorite_count,
       });
     });
-
-    // let numTweets = await redisClient.lLen("tweets:pinardag");
-    // console.log(`Query 5: tweets:pinardag has ${numTweets} tweets`);
-    let userTweet = await redisClient.hGetAll("tweet:1320362206014431232");
-    console.log(
-      "Query 5: user pinardag tweet:1320362206014431232 = ",
-      userTweet
-    );
   } catch (err) {
     console.log(err);
   } finally {

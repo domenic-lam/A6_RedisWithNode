@@ -16,7 +16,7 @@ First, clone repository,
 
 Then, in terminal:
 
-\*I created mongoDB.js that runs all queries with the same command.
+\*I created redisDB.js that runs all queries with the same command.
 To run all queries at once:
 
 1. `npm install`
@@ -25,8 +25,10 @@ To run all queries at once:
 To run queries 1-4 individually:
 
 1. `npm install`
-2. `node queries/query1`
-3. `node queries/query2`
-4. `node queries/query3`
-5. `node queries/query4`
-6. `node queries/query5`
+2. `node query1`
+3. `node query2`
+4. `node query3`
+5. `node query4`
+6. `node query5`
+
+\* query5 does not print anything to console, but using Redis CLI and viewing localhost, you can see the newly created values for each user (tweets:user) and tweet (tweet:tweetId).
