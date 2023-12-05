@@ -33,4 +33,4 @@ To run queries 1-4 individually:
 
 \* query5 does not print anything to console, but using Redis CLI and viewing localhost, you can see the newly created values for each user (tweets:user) and tweet (tweet:tweetId).
 
-Ely (Esther) Lam
+Domenic (Ely) Lam
